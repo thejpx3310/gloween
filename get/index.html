@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Downloading Resource — Gloween</title>
+  <title>Download Resource — Gloween</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -11,23 +11,52 @@
       background: #FAF7F0;
       color: #1A2421;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
       text-align: center;
     }
+
+    .inapp-alert {
+      display: none;
+      background: #FFF3CD;
+      border: 1.5px solid #FFEBAA;
+      color: #856404;
+      padding: 14px 16px;
+      border-radius: 12px;
+      max-width: 440px;
+      width: 100%;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .inapp-alert.show {
+      display: block;
+    }
+    .inapp-alert strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+      color: #664D03;
+    }
+
     .card {
       background: #FFFFFF;
       border: 1.5px solid #E5DEC9;
       border-radius: 20px;
-      padding: 36px 24px 28px;
+      padding: 34px 22px 26px;
       max-width: 440px;
       width: 100%;
       box-shadow: 0 10px 30px rgba(0,0,0,0.06);
     }
     .icon {
-      font-size: 48px;
-      margin-bottom: 16px;
+      font-size: 46px;
+      margin-bottom: 12px;
       display: inline-block;
       animation: bounce 1.4s ease-in-out infinite;
     }
@@ -46,20 +75,21 @@
       display: inline-block;
       background: #F4EFE6;
       border: 1px solid #D9CFBF;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #8A1E11;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       word-break: break-all;
     }
     p {
       font-size: 14px;
       color: #6A7670;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       line-height: 1.5;
     }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -71,7 +101,7 @@
       text-decoration: none;
       font-weight: 800;
       font-size: 16px;
-      padding: 15px 20px;
+      padding: 15px 18px;
       border-radius: 12px;
       box-shadow: 0 4px 14px rgba(40, 84, 62, 0.28);
       cursor: pointer;
@@ -82,12 +112,15 @@
       transform: scale(0.98);
       background: #1C3B2C;
     }
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+
+    .btn-secondary {
+      background: #15211D;
+      margin-top: 10px;
+      box-shadow: 0 4px 14px rgba(21, 33, 29, 0.2);
     }
+
     .brand {
-      margin-top: 24px;
+      margin-top: 22px;
       font-size: 12px;
       color: #8C9893;
       font-weight: 600;
@@ -100,13 +133,18 @@
   </style>
 </head>
 <body>
+  <div id="inAppAlert" class="inapp-alert">
+    <strong>⚠️ Instagram In-App Browser Detected</strong>
+    Tap the <b>three dots (⋮ or ...)</b> in the top right corner and choose <b>"Open in Chrome / Safari"</b> to download.
+  </div>
+
   <div class="card">
     <div class="icon">📥</div>
-    <h1>Your Download is Starting...</h1>
+    <h1>Your File is Ready!</h1>
     <div class="filename" id="fileDisplay">Loading resource...</div>
-    <p>Your file is downloading directly to your phone. If it doesn't start, tap the button below:</p>
+    <p>Tap below to save the file directly to your phone:</p>
     
-    <button id="downloadBtn" class="btn" onclick="triggerForcedDownload()">
+    <button id="downloadBtn" class="btn" onclick="triggerDownload()">
       <span id="btnText">Tap Here to Download (PDF)</span>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -115,13 +153,16 @@
       </svg>
     </button>
 
+    <a id="escapeBtn" href="#" class="btn btn-secondary" style="display: none;">
+      <span>Open in Chrome Browser 🌐</span>
+    </a>
+
     <div class="brand">
       © 2026 <a href="/">Gloween</a> · Creator Vault
     </div>
   </div>
 
   <script>
-    // Universal URL Parser: Reads ?file=FileName.pdf
     const urlParams = new URLSearchParams(window.location.search);
     const requestedFile = urlParams.get('file') || 'JAPAN REEL TUTORIALS.pdf';
     const cleanName = decodeURIComponent(requestedFile);
@@ -129,19 +170,36 @@
 
     const fileUrl = '/' + encodeURI(requestedFile);
 
-    // Force real file download using Blob
-    async function triggerForcedDownload() {
-      const btn = document.getElementById('downloadBtn');
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isInstagram = (ua.indexOf('Instagram') > -1) || (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
+    const isAndroid = /android/i.test(ua);
+
+    if (isInstagram) {
+      document.getElementById('inAppAlert').classList.add('show');
+      
+      if (isAndroid) {
+        const currentUrl = window.location.href.replace(/https?:\/\//i, '');
+        const chromeIntent = 'intent://' + currentUrl + '#Intent;scheme=https;package=com.android.chrome;end';
+        
+        const escapeBtn = document.getElementById('escapeBtn');
+        escapeBtn.href = chromeIntent;
+        escapeBtn.style.display = 'inline-flex';
+
+        setTimeout(() => {
+          window.location.href = chromeIntent;
+        }, 300);
+      }
+    }
+
+    async function triggerDownload() {
       const btnText = document.getElementById('btnText');
-      btnText.textContent = 'Downloading...';
-      btn.disabled = true;
+      btnText.textContent = 'Saving File...';
 
       try {
         const response = await fetch(fileUrl);
-        if (!response.ok) throw new Error('Network error');
         const blob = await response.blob();
-        
         const blobUrl = window.URL.createObjectURL(blob);
+        
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = blobUrl;
@@ -153,26 +211,17 @@
           window.URL.revokeObjectURL(blobUrl);
           document.body.removeChild(a);
           btnText.textContent = 'Downloaded! Tap to re-download';
-          btn.disabled = false;
         }, 1500);
-      } catch (err) {
-        const fallback = document.createElement('a');
-        fallback.href = fileUrl;
-        fallback.download = cleanName;
-        document.body.appendChild(fallback);
-        fallback.click();
-        document.body.removeChild(fallback);
-        btnText.textContent = 'Tap Here to Download (PDF)';
-        btn.disabled = false;
+      } catch (e) {
+        window.location.href = fileUrl;
       }
     }
 
-    // Auto-trigger on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        triggerForcedDownload();
-      }, 400);
-    });
+    if (!isInstagram) {
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(triggerDownload, 400);
+      });
+    }
   </script>
 </body>
 </html>
