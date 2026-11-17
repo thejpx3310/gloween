@@ -74,11 +74,17 @@
       padding: 15px 20px;
       border-radius: 12px;
       box-shadow: 0 4px 14px rgba(40, 84, 62, 0.28);
+      cursor: pointer;
+      border: none;
       transition: transform 0.15s ease, background 0.15s ease;
     }
     .btn:active {
       transform: scale(0.98);
       background: #1C3B2C;
+    }
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
     .brand {
       margin-top: 24px;
@@ -98,16 +104,16 @@
     <div class="icon">📥</div>
     <h1>Your Download is Starting...</h1>
     <div class="filename" id="fileDisplay">Loading resource...</div>
-    <p>Your file is downloading directly to your phone. If it doesn't start automatically within 3 seconds, tap below:</p>
+    <p>Your file is downloading directly to your phone. If it doesn't start, tap the button below:</p>
     
-    <a id="downloadBtn" href="#" download class="btn">
-      <span>Tap Here to Download (PDF)</span>
+    <button id="downloadBtn" class="btn" onclick="triggerForcedDownload()">
+      <span id="btnText">Tap Here to Download (PDF)</span>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
         <polyline points="7 10 12 15 17 10"></polyline>
         <line x1="12" y1="15" x2="12" y2="3"></line>
       </svg>
-    </a>
+    </button>
 
     <div class="brand">
       © 2026 <a href="/">Gloween</a> · Creator Vault
@@ -118,27 +124,54 @@
     // Universal URL Parser: Reads ?file=FileName.pdf
     const urlParams = new URLSearchParams(window.location.search);
     const requestedFile = urlParams.get('file') || 'JAPAN REEL TUTORIALS.pdf';
-
     const cleanName = decodeURIComponent(requestedFile);
     document.getElementById('fileDisplay').textContent = cleanName;
 
-    // Relative path to root files
     const fileUrl = '/' + encodeURI(requestedFile);
 
-    const downloadBtn = document.getElementById('downloadBtn');
-    downloadBtn.href = fileUrl;
-    downloadBtn.setAttribute('download', cleanName);
+    // Force real file download using Blob
+    async function triggerForcedDownload() {
+      const btn = document.getElementById('downloadBtn');
+      const btnText = document.getElementById('btnText');
+      btnText.textContent = 'Downloading...';
+      btn.disabled = true;
 
-    // Auto-trigger direct download on page load
+      try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) throw new Error('Network error');
+        const blob = await response.blob();
+        
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = cleanName;
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+          window.URL.revokeObjectURL(blobUrl);
+          document.body.removeChild(a);
+          btnText.textContent = 'Downloaded! Tap to re-download';
+          btn.disabled = false;
+        }, 1500);
+      } catch (err) {
+        const fallback = document.createElement('a');
+        fallback.href = fileUrl;
+        fallback.download = cleanName;
+        document.body.appendChild(fallback);
+        fallback.click();
+        document.body.removeChild(fallback);
+        btnText.textContent = 'Tap Here to Download (PDF)';
+        btn.disabled = false;
+      }
+    }
+
+    // Auto-trigger on page load
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
-        const link = document.createElement('a');
-        link.href = fileUrl;
-        link.download = cleanName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }, 500);
+        triggerForcedDownload();
+      }, 400);
     });
   </script>
 </body>
