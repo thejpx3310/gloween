@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Gloween</title>
+  <meta name="description" content="Gloween.">
+
+  <!-- Favicon: Craft Notebook / Glowing Tulip Icon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='10' y='8' width='44' height='48' rx='6' fill='%232D5A43' stroke='%231B3829' stroke-width='3.5'/%3E%3Cpath d='M18 8 v48' stroke='%23F4EEDD' stroke-width='2' stroke-dasharray='3 2' opacity='0.7'/%3E%3Cpath d='M32 24 C28 20 23 23 25 32 C27 40 32 44 32 44 C32 44 37 40 39 32 C41 23 36 20 32 24 Z' fill='%23E25B6C'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+
+  <script>
+    (function(){
+      try {
+        var t = localStorage.getItem('gloween-theme');
+        if (t === 'light' || t === 'dark') {
+          document.documentElement.setAttribute('data-theme', t);
+        }
+      } catch(e){}
+    })();
+  </script>
+
+  <style>
+    :root {
+      /* Botanical Warm Kraft Palette */
+      --paper: #FAF6ED;
+      --paper-grid: rgba(74, 93, 79, 0.05);
+      --card: #FFFFFF;
+      --ink: #1C2826;
+      --ink-soft: #2D3E3A;
+      --muted: #64756D;
+      --pencil: #84968E;
+      --outline: #1E3329;
+      --border-craft: #D9CEB8;
+
+      /* Signature Accent Colors */
+      --pine: #28543E;
+      --terracotta: #D36B3B;
+      --amber: #EAA844;
+
+      /* Cloud & Rain Colors */
+      --cloud-fill: #E8EEF2;
+      --cloud-shadow: #D1DCE5;
+      --cloud-outline: #2C3E50;
+      --cloud-alt: #DEE7ED;
+      --raindrop: #4D8BE2;
+      --splash: #5A99F0;
+
+      /* Soil & Ground */
+      --soil: #3B2E23;
+      --soil-border: #241A12;
+
+      --shadow-paper: 3px 3px 0 var(--outline);
+      --shadow-pill: 2px 2px 0 var(--outline);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-pill: 999px;
+
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-hand: 'Caveat', cursive, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --paper: #121915;
+      --paper-grid: rgba(200, 220, 205, 0.035);
+      --card: #19231E;
+      --ink: #EDE8DE;
+      --ink-soft: #D3CDC1;
+      --muted: #8E9F96;
+      --pencil: #6B7C73;
+      --outline: #090E0B;
+      --border-craft: #2E3E35;
+
+      --pine: #418263;
+      --terracotta: #E27B4D;
+      --amber: #F0B859;
+
+      --cloud-fill: #26333D;
+      --cloud-shadow: #1B242C;
+      --cloud-outline: #0E161C;
+      --cloud-alt: #1F2B34;
+      --raindrop: #72A5FF;
+      --splash: #8AB7FF;
+
+      --soil: #1F1711;
+      --soil-border: #120D08;
+
+      --shadow-paper: 3px 3px 0 #050706;
+      --shadow-pill: 2px 2px 0 #050706;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--paper);
+      background-image: 
+        linear-gradient(var(--paper-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--paper-grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    /* Header Nav */
+    header {
+      padding: 24px 0 16px;
+    }
+
+    .nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-emblem {
+      width: 34px;
+      height: 34px;
+      background: var(--pine);
+      border: 2px solid var(--outline);
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      box-shadow: 2px 2px 0 var(--outline);
+      color: #FFFDF7;
+      font-size: 17px;
+      font-family: var(--font-hand);
+      font-weight: bold;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card);
+      border: 1.5px solid var(--outline);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-pill);
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--ink);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-paper);
+    }
+
+    /* =========================================
+       CLOUD FORMATION & RAIN FIELD
+       ========================================= */
+    .weather-scene {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      margin: 10px auto 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 8;
+    }
+
+    /* Multi-Cloud Canopy covering full flower width (520px) */
+    .cloud-cluster {
+      position: relative;
+      width: 520px;
+      height: 110px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    @keyframes cloudDriftMain {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-7px) scale(1.015); }
+    }
+
+    @keyframes cloudDriftLeft {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-4px, -5px); }
+    }
+
+    @keyframes cloudDriftRight {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(4px, -6px); }
+    }
+
+    .cloud-main {
+      position: absolute;
+      left: 140px;
+      top: 5px;
+      animation: cloudDriftMain 5s ease-in-out infinite;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,0.08));
+      z-index: 12;
+    }
+
+    .cloud-left {
+      position: absolute;
+      left: 10px;
+      top: 18px;
+      animation: cloudDriftLeft 6s ease-in-out infinite 0.5s;
+      filter: drop-shadow(0 5px 12px rgba(0,0,0,0.06));
+      z-index: 11;
+      opacity: 0.96;
+    }
+
+    .cloud-right {
+      position: absolute;
+      right: 10px;
+      top: 22px;
+      animation: cloudDriftRight 5.6s ease-in-out infinite 1s;
+      filter: drop-shadow(0 5px 12px rgba(0,0,0,0.06));
+      z-index: 11;
+      opacity: 0.96;
+    }
+
+    /* Rain Layer ONLY originating directly beneath the clouds (500px span) */
+    .rain-field {
+      position: absolute;
+      top: 75px;
+      width: 500px; /* Exactly spans the cloud cluster boundary */
+      height: 365px; /* Extends right down to the soil ground */
+      overflow: visible;
+      pointer-events: none;
+      z-index: 6;
+      display: flex;
+      justify-content: space-around;
+      padding: 0 10px;
+    }
+
+    .raindrop {
+      position: relative;
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(to bottom, rgba(91, 146, 229, 0.1), var(--raindrop));
+      border-radius: 999px;
+      opacity: 0.8;
+      animation: rainFall 0.9s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
+    }
+
+    @keyframes rainFall {
+      0% {
+        transform: translateY(-10px);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.95;
+      }
+      88% {
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(322px); /* Perfectly hits the top of the green grass crest */
+        opacity: 0;
+      }
+    }
+
+    /* Staggered drops for natural rain shower */
+    .drop-1  { animation-delay: 0.05s; animation-duration: 0.82s; height: 18px; }
+    .drop-2  { animation-delay: 0.35s; animation-duration: 0.95s; height: 24px; }
+    .drop-3  { animation-delay: 0.15s; animation-duration: 0.88s; height: 16px; }
+    .drop-4  { animation-delay: 0.5s;  animation-duration: 0.78s; height: 22px; }
+    .drop-5  { animation-delay: 0.25s; animation-duration: 0.92s; height: 19px; }
+    .drop-6  { animation-delay: 0.65s; animation-duration: 0.84s; height: 17px; }
+    .drop-7  { animation-delay: 0.1s;  animation-duration: 0.98s; height: 23px; }
+    .drop-8  { animation-delay: 0.4s;  animation-duration: 0.86s; height: 18px; }
+    .drop-9  { animation-delay: 0.6s;  animation-duration: 0.8s;  height: 21px; }
+    .drop-10 { animation-delay: 0.2s;  animation-duration: 0.94s; height: 25px; }
+    .drop-11 { animation-delay: 0.45s; animation-duration: 0.88s; height: 17px; }
+    .drop-12 { animation-delay: 0.3s;  animation-duration: 0.82s; height: 20px; }
+    .drop-13 { animation-delay: 0.55s; animation-duration: 0.9s;  height: 22px; }
+    .drop-14 { animation-delay: 0.7s;  animation-duration: 0.85s; height: 18px; }
+
+    /* =========================================
+       SEAMLESS TULIP MEADOW (ZERO BOX / ZERO BORDER)
+       ========================================= */
+    .meadow-stage {
+      margin: 40px auto 0;
+      width: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      flex: 1;
+    }
+
+    /* Flowers Ground Row - Tight, Natural Cluster */
+    .flowers-container {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      height: 310px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 14px;
+      padding: 0 10px;
+      z-index: 5;
+    }
+
+    /* Individual Tulip Item */
+    .tulip-plant {
+      position: relative;
+      transform-origin: bottom center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      margin: 0 -4px;
+    }
+
+    /* Natural Wind Sway Keyframes */
+    @keyframes windSwayA {
+      0%, 100% { transform: rotate(0deg) skewX(0deg); }
+      25% { transform: rotate(5deg) skewX(3deg); }
+      50% { transform: rotate(-2deg) skewX(-1.5deg); }
+      75% { transform: rotate(6.5deg) skewX(4deg); }
+    }
+
+    @keyframes windSwayB {
+      0%, 100% { transform: rotate(0deg) skewX(0deg); }
+      30% { transform: rotate(-5deg) skewX(-3.5deg); }
+      60% { transform: rotate(3.5deg) skewX(2.5deg); }
+      85% { transform: rotate(-4deg) skewX(-3deg); }
+    }
+
+    @keyframes windSwayC {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(6deg) skewX(3.5deg); }
+      55% { transform: rotate(-4.5deg) skewX(-3deg); }
+      80% { transform: rotate(2.5deg) skewX(1.5deg); }
+    }
+
+    /* Staggered sway timing for authentic breeze feel */
+    .sway-1 { animation: windSwayA 4.2s ease-in-out infinite; }
+    .sway-2 { animation: windSwayB 5.1s ease-in-out infinite 0.3s; }
+    .sway-3 { animation: windSwayC 4.6s ease-in-out infinite 0.7s; }
+    .sway-4 { animation: windSwayA 5.4s ease-in-out infinite 0.2s; }
+    .sway-5 { animation: windSwayB 4.8s ease-in-out infinite 0.6s; }
+    .sway-6 { animation: windSwayC 5.3s ease-in-out infinite 0.9s; }
+    .sway-7 { animation: windSwayA 4.5s ease-in-out infinite 0.4s; }
+    .sway-8 { animation: windSwayB 4.9s ease-in-out infinite 0.8s; }
+
+    /* Tulip SVG Sizing & Filter */
+    .tulip-svg {
+      overflow: visible;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.08));
+    }
+
+    /* =========================================
+       ORGANIC EARTH BEDDING & RAIN SPLASHES
+       ========================================= */
+    .meadow-ground {
+      width: 100%;
+      max-width: 940px;
+      margin: 0 auto;
+      height: 44px;
+      background: var(--soil);
+      position: relative;
+      z-index: 10;
+      border-radius: var(--radius-md);
+      box-shadow: inset 0 6px 10px rgba(0,0,0,0.3);
+    }
+
+    .meadow-ground::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--pine) 0,
+        var(--pine) 6px,
+        #3C6E53 6px,
+        #3C6E53 12px,
+        #4E8B6B 12px,
+        #4E8B6B 18px
+      );
+      border-radius: 8px 8px 0 0;
+    }
+
+    /* Splashing Ripple & Droplet Layer directly on top of Green Grass */
+    .splash-strip {
+      position: absolute;
+      top: -24px; /* Perfectly aligned on top of the green lawn border */
+      left: 15%;
+      right: 15%; /* Concentrated under rain shower area */
+      height: 24px;
+      display: flex;
+      justify-content: space-around;
+      pointer-events: none;
+      z-index: 22; /* Sits on top of the green grass bed */
+    }
+
+    .splash-point {
+      position: relative;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Splash Ripple Wave expanding on contact */
+    .splash-point::before {
+      content: "";
+      position: absolute;
+      bottom: 2px;
+      width: 4px;
+      height: 2px;
+      border: 1.5px solid var(--splash);
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0.4);
+      animation: rippleExpand 0.9s ease-out infinite;
+    }
+
+    /* Splash Micro-Droplets bursting upwards */
+    .splash-point::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      width: 3px;
+      height: 4px;
+      background: var(--splash);
+      border-radius: 50%;
+      opacity: 0;
+      animation: dropletBounce 0.9s ease-out infinite;
+    }
+
+    @keyframes rippleExpand {
+      0% {
+        transform: scale(0.2);
+        opacity: 0;
+      }
+      80% {
+        opacity: 0;
+      }
+      85% {
+        opacity: 0.95;
+        transform: scale(0.6);
+      }
+      100% {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    @keyframes dropletBounce {
+      0%, 82% {
+        transform: translateY(0) scale(0);
+        opacity: 0;
+      }
+      88% {
+        transform: translateY(-10px) scale(1.1);
+        opacity: 1;
+      }
+      96% {
+        transform: translateY(-15px) scale(0.8);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-2px) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Staggered splash bursts matching incoming raindrops */
+    .sp-1 { animation-delay: 0.05s; }
+    .sp-2 { animation-delay: 0.35s; }
+    .sp-3 { animation-delay: 0.15s; }
+    .sp-4 { animation-delay: 0.5s;  }
+    .sp-5 { animation-delay: 0.25s; }
+    .sp-6 { animation-delay: 0.65s; }
+    .sp-7 { animation-delay: 0.1s;  }
+    .sp-8 { animation-delay: 0.4s;  }
+    .sp-9 { animation-delay: 0.6s;  }
+    .sp-10 { animation-delay: 0.2s; }
+    .sp-11 { animation-delay: 0.45s; }
+    .sp-12 { animation-delay: 0.3s; }
+
+    .sp-1::before, .sp-1::after { animation-delay: 0.05s; }
+    .sp-2::before, .sp-2::after { animation-delay: 0.35s; }
+    .sp-3::before, .sp-3::after { animation-delay: 0.15s; }
+    .sp-4::before, .sp-4::after { animation-delay: 0.5s; }
+    .sp-5::before, .sp-5::after { animation-delay: 0.25s; }
+    .sp-6::before, .sp-6::after { animation-delay: 0.65s; }
+    .sp-7::before, .sp-7::after { animation-delay: 0.1s; }
+    .sp-8::before, .sp-8::after { animation-delay: 0.4s; }
+    .sp-9::before, .sp-9::after { animation-delay: 0.6s; }
+    .sp-10::before, .sp-10::after { animation-delay: 0.2s; }
+    .sp-11::before, .sp-11::after { animation-delay: 0.45s; }
+    .sp-12::before, .sp-12::after { animation-delay: 0.3s; }
+
+
+    /* Minimalist Craft Footer */
+    footer {
+      margin-top: auto;
+      padding: 20px 0 16px;
+      background: var(--paper);
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 12px;
+      color: var(--pencil);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .flowers-container {
+        gap: 6px;
+        height: 270px;
+      }
+      .cloud-cluster {
+        width: 330px;
+      }
+      .cloud-main {
+        left: 60px;
+        transform: scale(0.85);
+      }
+      .cloud-left {
+        left: -10px;
+        transform: scale(0.75);
+      }
+      .cloud-right {
+        right: -10px;
+        transform: scale(0.75);
+      }
+      .rain-field {
+        width: 310px;
+      }
+      .tulip-plant:nth-child(even) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="nav-row">
+        <a href="/" class="brand-mark">
+          <div class="brand-emblem">G</div>
+          <span>Gloween</span>
+        </a>
+
+        <button id="themeToggle" class="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">
+          <svg id="moonIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="sunIcon" style="display:none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Cloud Canopy and Aligned Rain Shower -->
+    <div class="weather-scene">
+      <!-- Continuous Multi-Cloud Formation covering entire flower span -->
+      <div class="cloud-cluster">
+        <!-- Left Supporting Cloud -->
+        <div class="cloud-left">
+          <svg width="170" height="74" viewBox="0 0 170 74" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M38 62 H135 C148 62 160 52 160 40 C160 28 150 19 138 18 C135 9 125 2 112 2 C102 2 94 7 90 14 C85 9 77 6 68 6 C55 6 45 15 42 27 C39 26 36 25 33 25 C19 25 8 36 8 48 C8 56 16 62 38 62 Z" 
+                  fill="var(--cloud-shadow)" transform="translate(0, 3)"/>
+            <path d="M38 62 H135 C148 62 160 52 160 40 C160 28 150 19 138 18 C135 9 125 2 112 2 C102 2 94 7 90 14 C85 9 77 6 68 6 C55 6 45 15 42 27 C39 26 36 25 33 25 C19 25 8 36 8 48 C8 56 16 62 38 62 Z" 
+                  fill="var(--cloud-alt)" stroke="var(--cloud-outline)" stroke-width="2.2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Center Main Heavy Rain Cloud -->
+        <div class="cloud-main">
+          <svg width="240" height="100" viewBox="0 0 240 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M52 84 H198 C216 84 231 71 231 54 C231 39 218 27 203 26 C198 13 185 3 168 3 C155 3 144 9 137 19 C130 13 120 9 108 9 C91 9 77 20 74 36 C69 35 65 34 60 34 C42 34 27 48 27 65 C27 75 38 84 52 84 Z" 
+                  fill="var(--cloud-shadow)" transform="translate(0, 4)"/>
+            <path d="M52 84 H198 C216 84 231 71 231 54 C231 39 218 27 203 26 C198 13 185 3 168 3 C155 3 144 9 137 19 C130 13 120 9 108 9 C91 9 77 20 74 36 C69 35 65 34 60 34 C42 34 27 48 27 65 C27 75 38 84 52 84 Z" 
+                  fill="var(--cloud-fill)" stroke="var(--cloud-outline)" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M78 36 C82 25 94 19 107 19 C117 19 126 23 131 30" stroke="rgba(255,255,255,0.45)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M148 14 C156 11 167 12 175 19" stroke="rgba(255,255,255,0.45)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Right Supporting Cloud -->
+        <div class="cloud-right">
+          <svg width="180" height="78" viewBox="0 0 180 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M40 66 H145 C158 66 170 55 170 42 C170 30 159 20 146 19 C143 10 132 2 118 2 C108 2 99 7 95 15 C90 10 81 7 72 7 C58 7 47 16 44 29 C41 28 38 27 34 27 C20 27 8 38 8 51 C8 59 17 66 40 66 Z" 
+                  fill="var(--cloud-shadow)" transform="translate(0, 3)"/>
+            <path d="M40 66 H145 C158 66 170 55 170 42 C170 30 159 20 146 19 C143 10 132 2 118 2 C108 2 99 7 95 15 C90 10 81 7 72 7 C58 7 47 16 44 29 C41 28 38 27 34 27 C20 27 8 38 8 51 C8 59 17 66 40 66 Z" 
+                  fill="var(--cloud-alt)" stroke="var(--cloud-outline)" stroke-width="2.2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Rain Drops ONLY falling from under the cloud cluster -->
+      <div class="rain-field">
+        <div class="raindrop drop-1"></div>
+        <div class="raindrop drop-2"></div>
+        <div class="raindrop drop-3"></div>
+        <div class="raindrop drop-4"></div>
+        <div class="raindrop drop-5"></div>
+        <div class="raindrop drop-6"></div>
+        <div class="raindrop drop-7"></div>
+        <div class="raindrop drop-8"></div>
+        <div class="raindrop drop-9"></div>
+        <div class="raindrop drop-10"></div>
+        <div class="raindrop drop-11"></div>
+        <div class="raindrop drop-12"></div>
+        <div class="raindrop drop-13"></div>
+        <div class="raindrop drop-14"></div>
+      </div>
+    </div>
+
+    <!-- Swaying Multi-Color Tulip Meadow -->
+    <main class="meadow-stage">
+      <div class="flowers-container">
+        <!-- Tulip 1: Coral Crimson -->
+        <div class="tulip-plant sway-1" title="Coral Tulip">
+          <svg class="tulip-svg" width="56" height="230" viewBox="0 0 60 230">
+            <path d="M30 230 C30 155 26 80 30 50" stroke="#3D6B4E" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+            <path d="M30 175 C10 155 5 115 18 100 C22 125 28 150 30 175 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 150 C48 135 52 95 40 80 C37 105 32 130 30 150 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 50 C18 42 12 25 18 12 C24 22 28 35 30 50 Z" fill="#C93B4E"/>
+            <path d="M30 50 C42 42 48 25 42 12 C36 22 32 35 30 50 Z" fill="#C93B4E"/>
+            <path d="M30 48 C22 35 24 10 30 2 C36 10 38 35 30 48 Z" fill="#E64C62"/>
+            <path d="M30 50 C16 48 10 28 20 8 C25 24 30 38 30 50 Z" fill="#FF6B81" opacity="0.95"/>
+            <path d="M30 50 C44 48 50 28 40 8 C35 24 30 38 30 50 Z" fill="#F4516C"/>
+          </svg>
+        </div>
+
+        <!-- Tulip 2: Sunny Buttercup Amber -->
+        <div class="tulip-plant sway-2" title="Golden Amber Tulip">
+          <svg class="tulip-svg" width="58" height="260" viewBox="0 0 62 260">
+            <path d="M31 260 C31 175 35 90 31 52" stroke="#3D6B4E" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+            <path d="M31 195 C12 170 8 125 22 110 C25 137 29 165 31 195 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M31 165 C50 145 55 100 42 85 C39 113 34 140 31 165 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M31 52 C19 44 14 26 20 12 C26 23 29 37 31 52 Z" fill="#D99118"/>
+            <path d="M31 52 C43 44 48 26 42 12 C36 23 33 37 31 52 Z" fill="#D99118"/>
+            <path d="M31 50 C23 37 25 10 31 2 C37 10 39 37 31 50 Z" fill="#F5AB2B"/>
+            <path d="M31 52 C17 50 12 28 22 8 C27 24 31 40 31 52 Z" fill="#FFC843" opacity="0.95"/>
+            <path d="M31 52 C45 50 50 28 40 8 C35 24 31 40 31 52 Z" fill="#FBAF28"/>
+          </svg>
+        </div>
+
+        <!-- Tulip 3: Soft Lavender Violet -->
+        <div class="tulip-plant sway-3" title="Lavender Violet Tulip">
+          <svg class="tulip-svg" width="54" height="215" viewBox="0 0 58 215">
+            <path d="M29 215 C29 145 25 75 29 46" stroke="#3D6B4E" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+            <path d="M29 155 C10 140 6 100 18 85 C22 110 27 133 29 155 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M29 130 C46 115 50 80 38 67 C35 93 31 113 29 130 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M29 46 C18 38 13 22 19 10 C24 20 27 32 29 46 Z" fill="#754FA8"/>
+            <path d="M29 46 C40 38 45 22 39 10 C34 20 31 32 29 46 Z" fill="#754FA8"/>
+            <path d="M29 44 C22 32 24 8 29 2 C34 8 36 32 29 44 Z" fill="#9368CF"/>
+            <path d="M29 46 C16 44 11 25 20 6 C24 21 28 35 29 46 Z" fill="#B086EC" opacity="0.95"/>
+            <path d="M29 46 C42 44 47 25 38 6 C34 21 30 35 29 46 Z" fill="#9C73D9"/>
+          </svg>
+        </div>
+
+        <!-- Tulip 4: Deep Velvet Rose -->
+        <div class="tulip-plant sway-4" title="Deep Velvet Rose Tulip">
+          <svg class="tulip-svg" width="60" height="275" viewBox="0 0 64 275">
+            <path d="M32 275 C32 185 36 100 32 54" stroke="#3D6B4E" stroke-width="4.8" stroke-linecap="round" fill="none"/>
+            <path d="M32 205 C12 180 6 130 22 115 C25 145 30 175 32 205 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M32 170 C52 150 58 105 44 87 C41 117 36 145 32 170 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M32 54 C20 45 15 26 21 12 C27 24 30 38 32 54 Z" fill="#8C1935"/>
+            <path d="M32 54 C44 45 49 26 43 12 C37 24 34 38 32 54 Z" fill="#8C1935"/>
+            <path d="M32 52 C23 38 25 10 32 2 C39 10 41 38 32 52 Z" fill="#B32446"/>
+            <path d="M32 54 C17 51 12 28 22 8 C27 25 32 41 32 54 Z" fill="#D83158" opacity="0.95"/>
+            <path d="M32 54 C47 51 52 28 42 8 C37 25 32 41 32 54 Z" fill="#BF2449"/>
+          </svg>
+        </div>
+
+        <!-- Tulip 5: Terracotta Tangerine -->
+        <div class="tulip-plant sway-5" title="Terracotta Tangerine Tulip">
+          <svg class="tulip-svg" width="56" height="225" viewBox="0 0 60 225">
+            <path d="M30 225 C30 150 26 78 30 48" stroke="#3D6B4E" stroke-width="4.4" stroke-linecap="round" fill="none"/>
+            <path d="M30 165 C11 145 6 110 18 95 C22 120 27 143 30 165 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 140 C48 123 52 87 40 73 C37 99 33 123 30 140 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 48 C18 40 13 24 19 10 C24 21 28 34 30 48 Z" fill="#B84D20"/>
+            <path d="M30 48 C42 40 47 24 41 10 C36 21 32 34 30 48 Z" fill="#B84D20"/>
+            <path d="M30 46 C22 34 24 9 30 2 C36 9 38 34 30 46 Z" fill="#D3642D"/>
+            <path d="M30 48 C16 46 11 26 21 6 C25 22 29 36 30 48 Z" fill="#F07C41" opacity="0.95"/>
+            <path d="M30 48 C44 46 49 26 39 6 C35 22 31 36 30 48 Z" fill="#DF6B32"/>
+          </svg>
+        </div>
+
+        <!-- Tulip 6: Tender Pastel Pink -->
+        <div class="tulip-plant sway-6" title="Blush Pink Tulip">
+          <svg class="tulip-svg" width="54" height="250" viewBox="0 0 58 250">
+            <path d="M29 250 C29 165 33 85 29 50" stroke="#3D6B4E" stroke-width="4.3" stroke-linecap="round" fill="none"/>
+            <path d="M29 185 C11 160 7 120 20 105 C24 130 28 157 29 185 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M29 153 C47 135 52 93 40 79 C37 105 32 130 29 153 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M29 50 C18 42 13 25 19 12 C24 22 27 35 29 50 Z" fill="#D45D85"/>
+            <path d="M29 50 C40 42 45 25 39 12 C34 22 31 35 29 50 Z" fill="#D45D85"/>
+            <path d="M29 48 C22 35 24 10 29 2 C34 10 36 35 29 48 Z" fill="#EA7AA1"/>
+            <path d="M29 50 C16 48 11 27 20 8 C24 23 28 37 29 50 Z" fill="#FF9EBE" opacity="0.95"/>
+            <path d="M29 50 C42 48 47 27 38 8 C34 23 30 37 29 50 Z" fill="#F488AC"/>
+          </svg>
+        </div>
+
+        <!-- Tulip 7: Sunny Golden Amber (Second Variation) -->
+        <div class="tulip-plant sway-7" title="Sunny Amber Tulip">
+          <svg class="tulip-svg" width="56" height="220" viewBox="0 0 60 220">
+            <path d="M30 220 C30 150 26 78 30 48" stroke="#3D6B4E" stroke-width="4.3" stroke-linecap="round" fill="none"/>
+            <path d="M30 160 C11 140 6 105 18 90 C22 115 27 138 30 160 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 135 C48 118 52 82 40 68 C37 94 33 118 30 135 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 48 C18 40 13 24 19 10 C24 21 28 34 30 48 Z" fill="#D99118"/>
+            <path d="M30 48 C42 40 47 24 41 10 C36 21 32 34 30 48 Z" fill="#D99118"/>
+            <path d="M30 46 C22 34 24 9 30 2 C36 9 38 34 30 46 Z" fill="#F5AB2B"/>
+            <path d="M30 48 C16 46 11 26 21 6 C25 22 29 36 30 48 Z" fill="#FFC843" opacity="0.95"/>
+            <path d="M30 48 C44 46 49 26 39 6 C35 22 31 36 30 48 Z" fill="#FBAF28"/>
+          </svg>
+        </div>
+
+        <!-- Tulip 8: Ivory Cream Tulip -->
+        <div class="tulip-plant sway-8" title="Ivory Cream Tulip">
+          <svg class="tulip-svg" width="56" height="235" viewBox="0 0 60 235">
+            <path d="M30 235 C30 155 26 75 30 46" stroke="#3D6B4E" stroke-width="4.3" stroke-linecap="round" fill="none"/>
+            <path d="M30 170 C12 148 7 110 19 96 C23 120 28 142 30 170 Z" fill="#4B7E5D" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 140 C48 122 52 88 40 75 C37 100 33 122 30 140 Z" fill="#588E6B" stroke="#2D543B" stroke-width="1.2"/>
+            <path d="M30 46 C18 38 13 23 19 10 C24 20 28 32 30 46 Z" fill="#D5CDBC"/>
+            <path d="M30 46 C42 38 47 23 41 10 C36 20 32 32 30 46 Z" fill="#D5CDBC"/>
+            <path d="M30 44 C22 32 24 8 30 2 C36 8 38 32 30 44 Z" fill="#EAE2D1"/>
+            <path d="M30 46 C16 44 11 25 21 6 C25 21 29 35 30 46 Z" fill="#FFFDF8" opacity="0.95"/>
+            <path d="M30 46 C44 44 49 25 39 6 C35 21 31 35 30 46 Z" fill="#F2EADA"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Natural Earth / Soil Ground with Splash Effects -->
+      <div class="meadow-ground">
+        <!-- Live Rain Splashing layer right on the soil -->
+        <div class="splash-strip">
+          <div class="splash-point sp-1"></div>
+          <div class="splash-point sp-2"></div>
+          <div class="splash-point sp-3"></div>
+          <div class="splash-point sp-4"></div>
+          <div class="splash-point sp-5"></div>
+          <div class="splash-point sp-6"></div>
+          <div class="splash-point sp-7"></div>
+          <div class="splash-point sp-8"></div>
+          <div class="splash-point sp-9"></div>
+          <div class="splash-point sp-10"></div>
+          <div class="splash-point sp-11"></div>
+          <div class="splash-point sp-12"></div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <div>
+          © 2026 <strong>Gloween</strong>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Theme Switcher Logic
+    const toggleBtn = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+
+    function syncThemeIcons(theme) {
+      if (theme === 'dark') {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+      } else {
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    syncThemeIcons(currentTheme);
+
+    toggleBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('gloween-theme', active);
+      syncThemeIcons(active);
+    });
+  </script>
+</body>
+</html>
