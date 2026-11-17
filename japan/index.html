@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Downloading Japan Reel Tutorial — Gloween</title>
+  <title>Japan Reel Tutorial — Gloween</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -11,23 +11,53 @@
       background: #FAF7F0;
       color: #1A2421;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
       text-align: center;
     }
+
+    /* Instagram In-App Notice Bar */
+    .inapp-alert {
+      display: none;
+      background: #FFF3CD;
+      border: 1.5px solid #FFEBAA;
+      color: #856404;
+      padding: 14px 16px;
+      border-radius: 12px;
+      max-width: 440px;
+      width: 100%;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .inapp-alert.show {
+      display: block;
+    }
+    .inapp-alert strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+      color: #664D03;
+    }
+
     .card {
       background: #FFFFFF;
       border: 1.5px solid #E5DEC9;
       border-radius: 20px;
-      padding: 38px 24px 28px;
+      padding: 34px 22px 26px;
       max-width: 440px;
       width: 100%;
       box-shadow: 0 10px 30px rgba(0,0,0,0.06);
     }
     .icon {
-      font-size: 48px;
-      margin-bottom: 14px;
+      font-size: 46px;
+      margin-bottom: 12px;
       display: inline-block;
       animation: bounce 1.4s ease-in-out infinite;
     }
@@ -36,7 +66,7 @@
       50% { transform: translateY(-8px); }
     }
     h1 {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 800;
       margin-bottom: 8px;
       color: #15211D;
@@ -47,18 +77,19 @@
       background: #FAF1E6;
       border: 1px solid #D9CFBF;
       color: #B81E11;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     p {
       font-size: 14px;
       color: #6A7670;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       line-height: 1.5;
     }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -70,7 +101,7 @@
       text-decoration: none;
       font-weight: 800;
       font-size: 16px;
-      padding: 15px 20px;
+      padding: 15px 18px;
       border-radius: 12px;
       box-shadow: 0 4px 14px rgba(40, 84, 62, 0.28);
       cursor: pointer;
@@ -81,12 +112,15 @@
       transform: scale(0.98);
       background: #1C3B2C;
     }
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+
+    .btn-secondary {
+      background: #15211D;
+      margin-top: 10px;
+      box-shadow: 0 4px 14px rgba(21, 33, 29, 0.2);
     }
+
     .brand {
-      margin-top: 24px;
+      margin-top: 22px;
       font-size: 12px;
       color: #8C9893;
       font-weight: 600;
@@ -99,13 +133,20 @@
   </style>
 </head>
 <body>
+  <!-- Instagram in-app guidance for iPhone & Fallback -->
+  <div id="inAppAlert" class="inapp-alert">
+    <strong>⚠️ Instagram In-App Browser Detected</strong>
+    Tap the <b>three dots (⋮ or ...)</b> in the top right corner and choose <b>"Open in Chrome / Safari"</b> to download.
+  </div>
+
   <div class="card">
     <div class="icon">🎌</div>
-    <h1>Your Guide is Downloading...</h1>
+    <h1>Your Guide is Ready!</h1>
     <div class="badge">Japan Reel Tutorial (PDF)</div>
-    <p id="statusText">The guide is downloading directly to your phone. If it doesn't start, tap the button below:</p>
+    <p>Tap below to save the complete tutorial PDF directly to your device:</p>
     
-    <button id="downloadBtn" class="btn" onclick="triggerForcedDownload()">
+    <!-- Primary Download Button -->
+    <button id="downloadBtn" class="btn" onclick="triggerDownload()">
       <span id="btnText">Tap Here to Download (PDF)</span>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -113,6 +154,11 @@
         <line x1="12" y1="15" x2="12" y2="3"></line>
       </svg>
     </button>
+
+    <!-- External Browser Force Button (shown on mobile Instagram/FB) -->
+    <a id="escapeBtn" href="#" class="btn btn-secondary" style="display: none;">
+      <span>Open in Chrome Browser 🌐</span>
+    </a>
 
     <div class="brand">
       © 2026 <a href="/">Gloween</a> · Creator Vault
@@ -123,20 +169,40 @@
     const PDF_URL = '/JAPAN%20REEL%20TUTORIALS.pdf';
     const FILE_NAME = 'Japan-Reel-Tutorials.pdf';
 
-    // Force real file download using Blob so mobile browsers NEVER open PDF viewer
-    async function triggerForcedDownload() {
-      const btn = document.getElementById('downloadBtn');
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isInstagram = (ua.indexOf('Instagram') > -1) || (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
+    const isAndroid = /android/i.test(ua);
+
+    // If opened inside Instagram on Android -> Trigger Chrome Intent to escape directly to Chrome!
+    if (isInstagram) {
+      document.getElementById('inAppAlert').classList.add('show');
+      
+      if (isAndroid) {
+        // Construct Chrome intent
+        const currentUrl = window.location.href.replace(/https?:\/\//i, '');
+        const chromeIntent = 'intent://' + currentUrl + '#Intent;scheme=https;package=com.android.chrome;end';
+        
+        const escapeBtn = document.getElementById('escapeBtn');
+        escapeBtn.href = chromeIntent;
+        escapeBtn.style.display = 'inline-flex';
+
+        // Auto escape attempt
+        setTimeout(() => {
+          window.location.href = chromeIntent;
+        }, 300);
+      }
+    }
+
+    // Direct Blob forced download
+    async function triggerDownload() {
       const btnText = document.getElementById('btnText');
-      btnText.textContent = 'Downloading...';
-      btn.disabled = true;
+      btnText.textContent = 'Saving PDF...';
 
       try {
         const response = await fetch(PDF_URL);
-        if (!response.ok) throw new Error('Network error');
         const blob = await response.blob();
-        
-        // Create an Object URL from blob
         const blobUrl = window.URL.createObjectURL(blob);
+        
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = blobUrl;
@@ -148,27 +214,19 @@
           window.URL.revokeObjectURL(blobUrl);
           document.body.removeChild(a);
           btnText.textContent = 'Downloaded! Tap to re-download';
-          btn.disabled = false;
         }, 1500);
-      } catch (err) {
-        // Fallback standard click if fetch fails
-        const fallback = document.createElement('a');
-        fallback.href = PDF_URL;
-        fallback.download = FILE_NAME;
-        document.body.appendChild(fallback);
-        fallback.click();
-        document.body.removeChild(fallback);
-        btnText.textContent = 'Tap Here to Download (PDF)';
-        btn.disabled = false;
+      } catch (e) {
+        // Fallback
+        window.location.href = PDF_URL;
       }
     }
 
-    // Auto-trigger on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        triggerForcedDownload();
-      }, 400);
-    });
+    // Auto trigger download if regular Chrome/Safari
+    if (!isInstagram) {
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(triggerDownload, 400);
+      });
+    }
   </script>
 </body>
 </html>
